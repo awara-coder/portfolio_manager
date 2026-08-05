@@ -1,0 +1,57 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+
+# Financial and broker data
+data/
+imports/
+exports/
+reports/private/
+*.csv
+*.tsv
+*.ofx
+*.qfx
+
+# Python
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.venv/
+.coverage
+coverage.xml
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# JavaScript and Next.js
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+
+# Tooling and operating systems
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*.log
+.cache/
+.tmp/
+tmp/
+
+# Local containers and object storage
+.docker-data/
+.minio/
