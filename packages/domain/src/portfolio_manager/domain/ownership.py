@@ -15,7 +15,7 @@ from portfolio_manager.domain.identifiers import (
     TenantId,
     UserId,
 )
-from portfolio_manager.domain.numeric import Currency
+from portfolio_manager.domain.numeric import Currency, Price, Quantity
 from portfolio_manager.domain.temporal import as_utc
 
 
@@ -50,7 +50,15 @@ class AssetClass(StrEnum):
     FUTURE = "future"
     COMMODITY = "commodity"
     CURRENCY = "currency"
+    CFD = "cfd"
+    WARRANT = "warrant"
+    STRUCTURED_PRODUCT = "structured_product"
     OTHER = "other"
+
+
+class OptionRight(StrEnum):
+    CALL = "call"
+    PUT = "put"
 
 
 @dataclass(frozen=True, slots=True)
@@ -152,9 +160,24 @@ class Instrument:
     id: InstrumentId
     name: str
     asset_class: AssetClass
+    multiplier: Quantity | None = None
+    underlying_id: InstrumentId | None = None
+    expiry: date | None = None
+    strike: Price | None = None
+    option_right: OptionRight | None = None
 
     def __post_init__(self) -> None:
         _require_text(self.name, "instrument name", maximum=240)
+        if self.multiplier is not None and self.multiplier.value <= 0:
+            raise ValueError("instrument multiplier must be positive")
+        if self.underlying_id == self.id:
+            raise ValueError("instrument cannot be its own underlying")
+        option_terms = (self.expiry, self.strike, self.option_right)
+        if self.asset_class is AssetClass.OPTION:
+            if any(term is None for term in option_terms):
+                raise ValueError("option requires expiry, strike, and option right")
+        elif any(term is not None for term in option_terms):
+            raise ValueError("option terms are allowed only for options")
 
 
 @dataclass(frozen=True, slots=True)

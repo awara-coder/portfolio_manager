@@ -23,6 +23,19 @@ class TaxLotAuthority(StrEnum):
     DERIVED = "derived"
 
 
+class AccountMetricKind(StrEnum):
+    TOTAL_CASH = "total_cash"
+    SETTLED_CASH = "settled_cash"
+    NET_LIQUIDATION_VALUE = "net_liquidation_value"
+    ACCRUED_INTEREST = "accrued_interest"
+    DIVIDEND_ACCRUAL = "dividend_accrual"
+
+
+class AccrualKind(StrEnum):
+    INTEREST = "interest"
+    DIVIDEND = "dividend"
+
+
 @dataclass(frozen=True, slots=True)
 class PositionValue:
     broker_account_id: BrokerAccountId
@@ -48,6 +61,44 @@ class FxRateValue:
 
 
 @dataclass(frozen=True, slots=True)
+class PositionValuationValue:
+    broker_account_id: BrokerAccountId
+    instrument_id: InstrumentId
+    mark_price: Price | None = None
+    market_value: Money | None = None
+    cost_basis: Money | None = None
+    realized_pnl: Money | None = None
+    unrealized_pnl: Money | None = None
+
+    def __post_init__(self) -> None:
+        metrics = (
+            self.mark_price,
+            self.market_value,
+            self.cost_basis,
+            self.realized_pnl,
+            self.unrealized_pnl,
+        )
+        if all(metric is None for metric in metrics):
+            raise ValueError("position valuation requires at least one metric")
+
+
+@dataclass(frozen=True, slots=True)
+class AccountMetricValue:
+    broker_account_id: BrokerAccountId
+    kind: AccountMetricKind
+    value: Money
+
+
+@dataclass(frozen=True, slots=True)
+class AccrualValue:
+    broker_account_id: BrokerAccountId
+    kind: AccrualKind
+    amount: Money
+    instrument_id: InstrumentId | None = None
+    expected_on: date | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class TaxLotValue:
     broker_account_id: BrokerAccountId
     instrument_id: InstrumentId
@@ -69,7 +120,16 @@ class TaxLotValue:
             raise ValueError("policy version must be non-empty and trimmed")
 
 
-ObservationValue = PositionValue | CashBalanceValue | PriceValue | FxRateValue | TaxLotValue
+ObservationValue = (
+    PositionValue
+    | CashBalanceValue
+    | PriceValue
+    | FxRateValue
+    | PositionValuationValue
+    | AccountMetricValue
+    | AccrualValue
+    | TaxLotValue
+)
 
 
 @dataclass(frozen=True, slots=True)

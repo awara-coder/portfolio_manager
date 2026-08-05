@@ -1,9 +1,9 @@
 # ADR 0008: IBKR-driven canonical-model extensions
 
-- Status: proposed
+- Status: approved
 - Date: 2026-08-05
 - Gate: G2 amendment
-- Approved by: pending product-owner approval
+- Approved by: product owner
 
 ## Context
 

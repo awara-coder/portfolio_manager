@@ -1,4 +1,5 @@
 from datetime import UTC, date, datetime, timedelta, timezone
+from decimal import Decimal
 
 import pytest
 
@@ -20,6 +21,9 @@ from portfolio_manager.domain import (
     Listing,
     ListingId,
     MembershipRole,
+    OptionRight,
+    Price,
+    Quantity,
     Tenant,
     TenantId,
     TenantMembership,
@@ -114,6 +118,48 @@ def test_listing_preserves_instrument_identity_separately_from_symbol() -> None:
 
     assert listing.instrument_id == instrument.id
     assert listing.symbol == "EXAMPLE"
+
+
+def test_option_preserves_contract_terms() -> None:
+    underlying_id = InstrumentId.new()
+    option = Instrument(
+        InstrumentId.new(),
+        "Example call",
+        AssetClass.OPTION,
+        multiplier=Quantity(Decimal("100")),
+        underlying_id=underlying_id,
+        expiry=date(2026, 9, 25),
+        strike=Price(Decimal("250"), Currency("USD")),
+        option_right=OptionRight.CALL,
+    )
+
+    assert option.underlying_id == underlying_id
+    assert option.multiplier == Quantity(Decimal("100"))
+
+
+def test_option_requires_complete_contract_terms() -> None:
+    with pytest.raises(ValueError, match="requires expiry"):
+        Instrument(InstrumentId.new(), "Incomplete option", AssetClass.OPTION)
+
+
+def test_non_option_rejects_option_terms() -> None:
+    with pytest.raises(ValueError, match="only for options"):
+        Instrument(
+            InstrumentId.new(),
+            "Equity",
+            AssetClass.EQUITY,
+            option_right=OptionRight.PUT,
+        )
+
+
+def test_instrument_multiplier_must_be_positive() -> None:
+    with pytest.raises(ValueError, match="positive"):
+        Instrument(
+            InstrumentId.new(),
+            "Future",
+            AssetClass.FUTURE,
+            multiplier=Quantity(Decimal("0")),
+        )
 
 
 def test_listing_rejects_reversed_validity() -> None:

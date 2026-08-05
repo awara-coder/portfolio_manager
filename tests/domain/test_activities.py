@@ -10,12 +10,14 @@ from portfolio_manager.domain import (
     BrokerAccountId,
     CashLeg,
     CashLegRole,
+    CorporateActionType,
     Currency,
     FeeCategory,
     InstrumentId,
     InstrumentLeg,
     InstrumentLegRole,
     Money,
+    Price,
     Quantity,
     SourceRecordId,
     TaxCategory,
@@ -40,6 +42,7 @@ def activity(
     transfer_id: TransferId | None = None,
     transfer_direction: TransferDirection | None = None,
     transfer_method: TransferMethod | None = None,
+    corporate_action_type: CorporateActionType | None = None,
 ) -> Activity:
     return Activity(
         ActivityId.new(),
@@ -53,6 +56,7 @@ def activity(
         transfer_id=transfer_id,
         transfer_direction=transfer_direction,
         transfer_method=transfer_method,
+        corporate_action_type=corporate_action_type,
     )
 
 
@@ -72,6 +76,40 @@ def test_trade_supports_security_cash_fee_and_tax_legs() -> None:
     )
 
     assert len(trade.legs) == 4
+
+
+def test_trade_leg_preserves_source_execution_price() -> None:
+    leg = InstrumentLeg(
+        InstrumentId.new(),
+        Quantity(Decimal("1")),
+        execution_price=Price(Decimal("125.50"), USD),
+    )
+
+    assert leg.execution_price == Price(Decimal("125.50"), USD)
+
+
+def test_corporate_action_requires_and_preserves_subtype() -> None:
+    item = activity(
+        ActivityKind.CORPORATE_ACTION,
+        InstrumentLeg(
+            InstrumentId.new(),
+            Quantity(Decimal("-1")),
+            InstrumentLegRole.CORPORATE_ACTION,
+        ),
+        corporate_action_type=CorporateActionType.EXPIRATION,
+    )
+
+    assert item.corporate_action_type is CorporateActionType.EXPIRATION
+
+    with pytest.raises(ValueError, match="requires a subtype"):
+        activity(
+            ActivityKind.CORPORATE_ACTION,
+            InstrumentLeg(
+                InstrumentId.new(),
+                Quantity(Decimal("1")),
+                InstrumentLegRole.CORPORATE_ACTION,
+            ),
+        )
 
 
 def test_tcs_is_distinct_from_fee() -> None:
