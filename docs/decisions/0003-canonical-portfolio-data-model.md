@@ -1,9 +1,9 @@
 # ADR 0003: Canonical portfolio data model
 
-- Status: proposed
+- Status: approved
 - Date: 2026-08-05
 - Gate: G2
-- Approved by: pending
+- Approved by: product owner
 
 ## Context
 
