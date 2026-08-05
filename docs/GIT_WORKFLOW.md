@@ -56,3 +56,7 @@ After integration and ledger update, confirm the exact worktree path and branch 
 Parallel branches are appropriate for disjoint implementations against an approved contract. Examples include a connector fixture suite and browser component primitives. They are inappropriate when branches would independently define a shared schema, migration parent, or API response.
 
 Keep branches short-lived. A feature larger than roughly two working days should be decomposed into safe increments or protected by an inactive feature flag.
+
+## Baseline verification
+
+The workflow was exercised on 2026-08-05 with the documentation-only `docs/worktree-smoke` branch in a disposable worktree. The branch was created from `main`, changed only planning documentation, passed staged-diff checks, and was integrated serially before the worktree was retired.

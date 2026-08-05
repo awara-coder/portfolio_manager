@@ -143,6 +143,7 @@ Update this table before beginning work. Use agent/task identifiers rather than 
 | Task | Branch | Worktree | Owner | Depends on | Status | Last update |
 |---|---|---|---|---|---|---|
 | Planning baseline | `main` | repository root | primary agent | none | in progress | 2026-08-05 |
+| Worktree smoke test | `docs/worktree-smoke` | `/private/tmp/portfolio-manager-worktrees/docs-worktree-smoke` | primary agent | Planning baseline | done | 2026-08-05 |
 
 Valid states: `planned`, `blocked`, `ready`, `in progress`, `in review`, `integrating`, `done`.
 
