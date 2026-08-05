@@ -153,7 +153,8 @@ Update this table before beginning work. Use agent/task identifiers rather than 
 | Domain value objects | `feat/domain-value-objects` | `/private/tmp/portfolio-manager-worktrees/domain-value-objects` | primary agent | G2/G4 approved | done | 2026-08-05 |
 | Tenant-owned domain entities | `feat/domain-ownership` | `/private/tmp/portfolio-manager-worktrees/domain-ownership` | primary agent | Domain value objects | done | 2026-08-05 |
 | Immutable activity model | `feat/domain-activities` | `/private/tmp/portfolio-manager-worktrees/domain-activities` | primary agent | Tenant-owned domain entities | done | 2026-08-05 |
-| Immutable observation model | `feat/domain-observations` | `/private/tmp/portfolio-manager-worktrees/domain-observations` | primary agent | Immutable activity model | in progress | 2026-08-05 |
+| Immutable observation model | `feat/domain-observations` | `/private/tmp/portfolio-manager-worktrees/domain-observations` | primary agent | Immutable activity model | done | 2026-08-05 |
+| Record G7 and propose connector contract | `docs/approve-g7-connector-contract` | `/private/tmp/portfolio-manager-worktrees/approve-g7-connector-contract` | primary agent | G7 product-owner approval | in progress | 2026-08-05 |
 
 Valid states: `planned`, `blocked`, `ready`, `in progress`, `in review`, `integrating`, `done`.
 
