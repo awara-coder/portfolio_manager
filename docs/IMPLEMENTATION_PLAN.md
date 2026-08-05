@@ -148,6 +148,7 @@ Update this table before beginning work. Use agent/task identifiers rather than 
 | Configure code ownership | `chore/configure-codeowners` | `/private/tmp/portfolio-manager-worktrees/configure-codeowners` | primary agent | GitHub owner supplied | done | 2026-08-05 |
 | Governance baseline | `docs/governance-baseline` | `/private/tmp/portfolio-manager-worktrees/governance-baseline` | primary agent | G0/G1 approved | done | 2026-08-05 |
 | Python workspace bootstrap | `chore/python-workspace-bootstrap` | `/private/tmp/portfolio-manager-worktrees/python-workspace-bootstrap` | primary agent | G1 approved | done | 2026-08-05 |
+| Propose G2 data model | `docs/propose-g2-data-model` | `/private/tmp/portfolio-manager-worktrees/g2-data-model` | primary agent | Python workspace bootstrap | in review | 2026-08-05 |
 
 Valid states: `planned`, `blocked`, `ready`, `in progress`, `in review`, `integrating`, `done`.
 
