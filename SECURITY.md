@@ -24,3 +24,5 @@ The maintainer will acknowledge a report as soon as practical, assess severity a
 - Logs and diagnostic bundles must redact secrets and personal financial data.
 
 See `AGENTS.md` and `docs/architecture/MODULE_BOUNDARIES.md` for mandatory engineering controls.
+
+The proposed application threat model is maintained in [`docs/security/THREAT_MODEL.md`](docs/security/THREAT_MODEL.md). Controls in a proposed ADR are not considered implemented until their verification tests pass.
