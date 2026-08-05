@@ -44,16 +44,25 @@ class CashLegRole(StrEnum):
 class FeeCategory(StrEnum):
     BROKERAGE = "brokerage"
     PLATFORM = "platform"
-    EXCHANGE_REGULATORY = "exchange_regulatory"
+    EXCHANGE = "exchange"
+    REGULATORY = "regulatory"
+    DEPOSITORY = "depository"
     BANK = "bank"
     FX = "fx"
+    ACCOUNT_MAINTENANCE = "account_maintenance"
+    INTEREST = "interest"
     OTHER = "other"
 
 
 class TaxCategory(StrEnum):
-    WITHHOLDING = "withholding"
+    SECURITIES_TRANSACTION = "securities_transaction"
+    COMMODITIES_TRANSACTION = "commodities_transaction"
+    GST_VAT = "gst_vat"
+    STAMP_DUTY = "stamp_duty"
+    DOMESTIC_WITHHOLDING = "domestic_withholding"
+    FOREIGN_WITHHOLDING = "foreign_withholding"
     TCS = "tcs"
-    TRANSACTION = "transaction"
+    OTHER_TRANSACTION = "other_transaction"
     OTHER = "other"
 
 
@@ -70,6 +79,7 @@ class CashLeg:
     role: CashLegRole
     fee_category: FeeCategory | None = None
     tax_category: TaxCategory | None = None
+    tax_jurisdiction: str | None = None
     source_label: str | None = None
 
     def __post_init__(self) -> None:
@@ -77,6 +87,15 @@ class CashLeg:
             raise ValueError("fee category is required only for fee legs")
         if (self.role is CashLegRole.TAX) != (self.tax_category is not None):
             raise ValueError("tax category is required only for tax legs")
+        if self.role is not CashLegRole.TAX and self.tax_jurisdiction is not None:
+            raise ValueError("tax jurisdiction is allowed only for tax legs")
+        if self.tax_jurisdiction is not None and (
+            len(self.tax_jurisdiction) != 2
+            or not self.tax_jurisdiction.isascii()
+            or not self.tax_jurisdiction.isalpha()
+            or self.tax_jurisdiction != self.tax_jurisdiction.upper()
+        ):
+            raise ValueError("tax jurisdiction must be a two-letter uppercase country code")
         if self.source_label is not None and (
             not self.source_label or self.source_label != self.source_label.strip()
         ):

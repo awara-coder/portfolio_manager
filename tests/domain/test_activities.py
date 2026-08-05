@@ -49,7 +49,13 @@ def test_trade_supports_security_cash_fee_and_tax_legs() -> None:
         InstrumentLeg(InstrumentId.new(), Quantity(Decimal("10.5"))),
         cash("-1000", INR, CashLegRole.PRINCIPAL),
         CashLeg(Money(Decimal("-2"), INR), CashLegRole.FEE, FeeCategory.BROKERAGE),
-        CashLeg(Money(Decimal("-1"), INR), CashLegRole.TAX, tax_category=TaxCategory.TRANSACTION),
+        CashLeg(
+            Money(Decimal("-1"), INR),
+            CashLegRole.TAX,
+            tax_category=TaxCategory.SECURITIES_TRANSACTION,
+            tax_jurisdiction="IN",
+            source_label="STT",
+        ),
     )
 
     assert len(trade.legs) == 4
@@ -63,6 +69,47 @@ def test_tcs_is_distinct_from_fee() -> None:
 
     assert isinstance(tax.legs[0], CashLeg)
     assert tax.legs[0].tax_category is TaxCategory.TCS
+
+
+def test_foreign_dividend_withholding_retains_jurisdiction() -> None:
+    withholding = activity(
+        ActivityKind.TAX,
+        CashLeg(
+            Money(Decimal("-25"), USD),
+            CashLegRole.TAX,
+            tax_category=TaxCategory.FOREIGN_WITHHOLDING,
+            tax_jurisdiction="US",
+            source_label="US TAX",
+        ),
+    )
+
+    assert isinstance(withholding.legs[0], CashLeg)
+    assert withholding.legs[0].tax_jurisdiction == "US"
+
+
+@pytest.mark.parametrize(
+    "category",
+    [
+        TaxCategory.SECURITIES_TRANSACTION,
+        TaxCategory.COMMODITIES_TRANSACTION,
+        TaxCategory.GST_VAT,
+        TaxCategory.STAMP_DUTY,
+        TaxCategory.DOMESTIC_WITHHOLDING,
+        TaxCategory.FOREIGN_WITHHOLDING,
+        TaxCategory.TCS,
+        TaxCategory.OTHER_TRANSACTION,
+        TaxCategory.OTHER,
+    ],
+)
+def test_supported_tax_categories_remain_distinct(category: TaxCategory) -> None:
+    leg = CashLeg(
+        Money(Decimal("-1"), INR),
+        CashLegRole.TAX,
+        tax_category=category,
+        tax_jurisdiction="IN",
+    )
+
+    assert leg.tax_category is category
 
 
 def test_fx_conversion_requires_two_currencies() -> None:
@@ -102,6 +149,25 @@ def test_fee_and_tax_categories_are_role_specific() -> None:
         cash("-1", INR, CashLegRole.FEE)
     with pytest.raises(ValueError, match="tax category"):
         CashLeg(Money(Decimal("-1"), INR), CashLegRole.PRINCIPAL, tax_category=TaxCategory.TCS)
+
+    with pytest.raises(ValueError, match="jurisdiction"):
+        CashLeg(
+            Money(Decimal("-1"), INR),
+            CashLegRole.FEE,
+            fee_category=FeeCategory.REGULATORY,
+            tax_jurisdiction="IN",
+        )
+
+
+@pytest.mark.parametrize("jurisdiction", ["in", "IND", "I1", ""])
+def test_tax_jurisdiction_requires_country_code_shape(jurisdiction: str) -> None:
+    with pytest.raises(ValueError, match="two-letter uppercase"):
+        CashLeg(
+            Money(Decimal("-1"), INR),
+            CashLegRole.TAX,
+            tax_category=TaxCategory.TCS,
+            tax_jurisdiction=jurisdiction,
+        )
 
 
 def test_activity_cannot_supersede_itself() -> None:
