@@ -4,6 +4,8 @@ ADRs record consequential decisions without duplicating implementation documenta
 
 Statuses are `proposed`, `approved`, `superseded`, or `rejected`. Material changes require a new ADR that supersedes the old one.
 
+Copy [template.md](template.md) for a new decision. Keep ADRs concise; put implementation detail in focused technical documentation.
+
 | ADR | Decision | Status |
 |---|---|---|
 | [0001](0001-apache-2-license.md) | Apache License 2.0 | approved |

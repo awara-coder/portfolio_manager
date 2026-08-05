@@ -1,0 +1,50 @@
+name: Bug report
+description: Report reproducible incorrect behavior using synthetic or sanitized data.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Never include credentials, account identifiers, statements, or private portfolio data.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Provide minimal steps using synthetic or sanitized data.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+    validations:
+      required: true
+  - type: dropdown
+    id: data_source
+    attributes:
+      label: Affected source
+      options:
+        - Synthetic/demo
+        - Zerodha
+        - IBKR
+        - Market data or FX
+        - Browser/API/MCP
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed secrets, account identifiers, statements, and private financial data.
+          required: true
+        - label: This is not a security vulnerability requiring private reporting.
+          required: true
