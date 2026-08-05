@@ -1,0 +1,61 @@
+version = 1
+
+[modules.domain]
+path = "packages/domain"
+import_prefix = "portfolio_manager.domain"
+may_import = []
+
+[modules.application]
+path = "packages/application"
+import_prefix = "portfolio_manager.application"
+may_import = ["domain"]
+
+[modules.analytics]
+path = "packages/analytics"
+import_prefix = "portfolio_manager.analytics"
+may_import = ["domain"]
+
+[modules.reporting]
+path = "packages/reporting"
+import_prefix = "portfolio_manager.reporting"
+may_import = ["domain", "analytics"]
+
+[modules.assistant]
+path = "packages/assistant"
+import_prefix = "portfolio_manager.assistant"
+may_import = ["domain", "application"]
+
+[modules.connectors]
+path = "packages/connectors"
+import_prefix = "portfolio_manager.connectors"
+may_import = ["domain", "application"]
+
+[modules.persistence]
+path = "packages/persistence"
+import_prefix = "portfolio_manager.persistence"
+may_import = ["domain", "application"]
+
+[modules.jobs]
+path = "packages/jobs"
+import_prefix = "portfolio_manager.jobs"
+may_import = ["application"]
+
+[modules.observability]
+path = "packages/observability"
+import_prefix = "portfolio_manager.observability"
+may_import = []
+
+[modules.api]
+path = "apps/api"
+import_prefix = "portfolio_manager.apps.api"
+may_import = ["domain", "application", "persistence", "jobs", "observability"]
+
+[modules.worker]
+path = "apps/worker"
+import_prefix = "portfolio_manager.apps.worker"
+may_import = ["domain", "application", "connectors", "persistence", "jobs", "analytics", "reporting", "observability"]
+
+[modules.mcp]
+path = "apps/mcp"
+import_prefix = "portfolio_manager.apps.mcp"
+may_import = ["domain", "application", "assistant", "persistence", "observability"]

@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: architecture-boundaries
+        name: architecture boundaries
+        entry: python3 scripts/check_architecture.py --root .
+        language: system
+        pass_filenames: false
+        always_run: true

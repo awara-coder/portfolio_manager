@@ -79,6 +79,10 @@ Domain code must not import FastAPI, broker SDKs, database sessions, Redis, LLM 
 
 Prefer explicit interfaces and dependency injection at module boundaries. Do not introduce microservices until measurements show a concrete isolation or scaling need and the operational trade-off is approved.
 
+`architecture.toml` is the machine-readable boundary policy. Each backend module must become a separately declared `uv` workspace package. Local pre-commit checks, Import Linter contracts, and required CI must all pass before integration. Do not bypass, weaken, rename, or exclude modules from enforcement to make a change pass. Changes to the policy, checker, workflows, ADRs, security rules, or canonical contracts require designated-owner review. Agents may propose these changes but may not self-approve them.
+
+Portfolio queries and calculations must accept an explicit scope. Consolidated, broker-specific, account-specific, and dimensional views must use the same calculation path rather than duplicating financial logic per dashboard.
+
 ## 6. Python standards
 
 - Use the repository-pinned Python version and `uv`; commit `uv.lock`.

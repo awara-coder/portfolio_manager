@@ -70,8 +70,8 @@ Create ADRs under `docs/decisions/` using the template established in Phase 0. A
 
 | Gate | Decision | Required before |
 |---|---|---|
-| G0 | Repository license and contribution model | Public release preparation |
-| G1 | System boundaries and module dependency rules | Phase 1 implementation |
+| G0 | Repository license and contribution model — approved in ADR 0001 | Public release preparation |
+| G1 | System boundaries and module dependency rules — approved in ADR 0002 | Phase 1 implementation |
 | G2 | Canonical data, ledger, snapshot, identifiers, and provenance model | Schema/domain implementation |
 | G3 | Financial calculations, cash flows, FX, rounding, valuation cutoff, and benchmark semantics | Analytics implementation |
 | G4 | Authentication, tenant isolation, secret storage, privacy, retention, and deletion model | Real account integration |
@@ -144,6 +144,7 @@ Update this table before beginning work. Use agent/task identifiers rather than 
 |---|---|---|---|---|---|---|
 | Planning baseline | `main` | repository root | primary agent | none | in progress | 2026-08-05 |
 | Worktree smoke test | `docs/worktree-smoke` | `/private/tmp/portfolio-manager-worktrees/docs-worktree-smoke` | primary agent | Planning baseline | done | 2026-08-05 |
+| Record G0/G1 decisions | `docs/approve-g0-g1` | `/private/tmp/portfolio-manager-worktrees/approve-g0-g1` | primary agent | G0 and G1 approval | done | 2026-08-05 |
 
 Valid states: `planned`, `blocked`, `ready`, `in progress`, `in review`, `integrating`, `done`.
 
@@ -220,11 +221,13 @@ Deliverables:
 
 - Proposed package tree and allowed dependency directions.
 - G1 ADR describing modular-monolith boundaries and extraction criteria.
-- Automated import/dependency boundary checks where practical.
+- Machine-readable dependency policy and automated boundary checks in required CI.
+- Separate `uv` workspace packages with declared internal dependencies, Import Linter contracts, and local pre-commit enforcement.
+- Designated-owner review for boundary policy, enforcement, security, schemas, and workflows once repository ownership is configured.
 
 Approval gate:
 
-- G1 before implementing domain packages.
+- G1 approved in ADR 0002. Boundary checks must remain green before implementing domain packages.
 
 ## 9. Phase 1 — Security and domain foundations
 
@@ -968,7 +971,7 @@ These are the next sequential actions after the user approves this plan:
 
 | Phase | Status | Approval state | Notes |
 |---|---|---|---|
-| 0. Repository and governance | in progress | G0/G1 pending | Git initialized on `main`; baseline verification in progress |
+| 0. Repository and governance | in progress | G0/G1 approved | Apache-2.0 and modular boundaries recorded; contributor/security setup remains |
 | 1. Security and domain foundations | planned | G2/G3/G4 pending | No real financial data before approval and controls |
 | 2. Synthetic vertical slice | planned | G5 pending | Must pass before real broker integration |
 | 3. Zerodha | planned | G7 pending | First broker; no automated login; reconstruction labeled |
