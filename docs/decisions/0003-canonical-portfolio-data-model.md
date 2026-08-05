@@ -45,7 +45,8 @@ Choose option 3. Use a broker-neutral, tenant-owned model with four layers:
 - Activity kinds initially include trade, deposit, withdrawal, dividend, interest, fee, tax, transfer, FX conversion, and corporate action. Unknown source kinds remain preserved as unsupported evidence rather than coerced.
 - Type-specific invariants validate leg combinations. Values in different currencies or units are not added merely to force artificial accounting balance.
 - Corrections create a new activity that explicitly supersedes an earlier activity. Imported rows and normalized activities are never updated in place.
-- A transfer may link withdrawal and deposit sides. If only one side is known, it remains an incomplete transfer rather than becoming income or expense.
+- A shared transfer identity links independently sourced inbound and outbound account sides. A side may contain cash, instruments, or both; if its peer is unknown, it remains incomplete rather than becoming income or expense.
+- ACATS lot basis is separate source evidence because it can arrive or be corrected after positions transfer. Fractional-share liquidation is recorded as a trade plus cash movement, not as a transferred fraction.
 - Corporate actions use explicit action and leg roles. A split changes quantity without fabricating cash; mergers, spin-offs, and return-of-capital events can carry multiple instrument and cash legs.
 - Fees and taxes use typed legs and retain both the source label and normalized category. Initial categories include brokerage, platform, exchange/regulatory, bank, FX, withholding tax, and tax collected at source (TCS); unknown charges remain unclassified rather than disappearing into net cash.
 - TCS is stored separately from fees so later tax treatment can distinguish a potentially creditable tax from investment cost. Its jurisdiction-specific calculation and reporting remain outside G2.

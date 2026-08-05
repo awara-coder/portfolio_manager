@@ -1,5 +1,17 @@
 """Broker-neutral portfolio domain."""
 
+from portfolio_manager.domain.activities import (
+    Activity,
+    ActivityKind,
+    CashLeg,
+    CashLegRole,
+    FeeCategory,
+    InstrumentLeg,
+    InstrumentLegRole,
+    TaxCategory,
+    TransferDirection,
+    TransferMethod,
+)
 from portfolio_manager.domain.identifiers import (
     ActivityId,
     BrokerAccountId,
@@ -15,6 +27,7 @@ from portfolio_manager.domain.identifiers import (
     SnapshotId,
     SourceRecordId,
     TenantId,
+    TransferId,
     UserId,
 )
 from portfolio_manager.domain.numeric import Currency, FxRate, Money, Price, Quantity
@@ -44,7 +57,9 @@ from portfolio_manager.domain.scope import PortfolioScope
 from portfolio_manager.domain.temporal import TimeRange, as_utc
 
 __all__ = [
+    "Activity",
     "ActivityId",
+    "ActivityKind",
     "AssetClass",
     "Authority",
     "BrokerAccount",
@@ -52,6 +67,8 @@ __all__ = [
     "BrokerConnection",
     "BrokerConnectionId",
     "BrokerInstrumentMapping",
+    "CashLeg",
+    "CashLegRole",
     "CollectionRunId",
     "Completeness",
     "Currency",
@@ -59,11 +76,14 @@ __all__ = [
     "ExternalCashAccount",
     "ExternalCashAccountId",
     "ExternalIdentifier",
+    "FeeCategory",
     "FxRate",
     "Institution",
     "InstitutionId",
     "Instrument",
     "InstrumentId",
+    "InstrumentLeg",
+    "InstrumentLegRole",
     "Listing",
     "ListingId",
     "MembershipRole",
@@ -78,10 +98,14 @@ __all__ = [
     "SettlementState",
     "SnapshotId",
     "SourceRecordId",
+    "TaxCategory",
     "Tenant",
     "TenantId",
     "TenantMembership",
     "TimeRange",
+    "TransferDirection",
+    "TransferId",
+    "TransferMethod",
     "User",
     "UserId",
     "as_utc",
