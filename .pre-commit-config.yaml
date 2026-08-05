@@ -7,3 +7,13 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
+      - id: python-fast-checks
+        name: Python fast checks
+        entry: uv run ruff check .
+        language: system
+        pass_filenames: false
+      - id: python-format
+        name: Python format
+        entry: uv run ruff format --check .
+        language: system
+        pass_filenames: false

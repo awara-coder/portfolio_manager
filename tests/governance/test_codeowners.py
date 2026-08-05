@@ -3,7 +3,6 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
-
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 EXPECTED_OWNER = "@awara-coder"
 REQUIRED_PATTERNS = {
