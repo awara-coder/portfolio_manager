@@ -1,9 +1,9 @@
 # ADR 0005: Zerodha sources and unattended mode
 
-- Status: proposed
+- Status: approved
 - Date: 2026-08-05
 - Gate: G7
-- Approved by: pending product-owner approval
+- Approved by: product owner
 
 ## Context
 
