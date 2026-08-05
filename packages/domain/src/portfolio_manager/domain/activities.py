@@ -10,6 +10,7 @@ from portfolio_manager.domain.identifiers import (
     InstrumentId,
     SourceRecordId,
     TenantId,
+    TransferId,
 )
 from portfolio_manager.domain.numeric import Money, Quantity
 from portfolio_manager.domain.temporal import as_utc
@@ -31,6 +32,7 @@ class ActivityKind(StrEnum):
 class InstrumentLegRole(StrEnum):
     POSITION = "position"
     CORPORATE_ACTION = "corporate_action"
+    TRANSFER = "transfer"
 
 
 class CashLegRole(StrEnum):
@@ -63,6 +65,18 @@ class TaxCategory(StrEnum):
     FOREIGN_WITHHOLDING = "foreign_withholding"
     TCS = "tcs"
     OTHER_TRANSACTION = "other_transaction"
+    OTHER = "other"
+
+
+class TransferDirection(StrEnum):
+    INBOUND = "inbound"
+    OUTBOUND = "outbound"
+
+
+class TransferMethod(StrEnum):
+    ACATS = "acats"
+    BROKER_TO_BROKER = "broker_to_broker"
+    BANK = "bank"
     OTHER = "other"
 
 
@@ -118,6 +132,9 @@ class Activity:
     trade_date: date | None = None
     settlement_date: date | None = None
     supersedes_id: ActivityId | None = None
+    transfer_id: TransferId | None = None
+    transfer_direction: TransferDirection | None = None
+    transfer_method: TransferMethod | None = None
 
     def __post_init__(self) -> None:
         if not self.legs:
@@ -155,8 +172,20 @@ class Activity:
             and CashLegRole.PRINCIPAL not in roles
         ):
             raise ValueError("cash movement requires a principal leg")
-        if self.kind is ActivityKind.TRANSFER and CashLegRole.TRANSFER not in roles:
-            raise ValueError("transfer requires a transfer leg")
+        transfer_metadata = (
+            self.transfer_id,
+            self.transfer_direction,
+            self.transfer_method,
+        )
+        if self.kind is ActivityKind.TRANSFER:
+            if any(value is None for value in transfer_metadata):
+                raise ValueError("transfer requires identity, direction, and method")
+            has_cash = CashLegRole.TRANSFER in roles
+            has_instrument = any(leg.role is InstrumentLegRole.TRANSFER for leg in instrument_legs)
+            if not has_cash and not has_instrument:
+                raise ValueError("transfer requires a transfer leg")
+        elif any(value is not None for value in transfer_metadata):
+            raise ValueError("transfer metadata is allowed only for transfer activities")
         if self.kind is ActivityKind.CORPORATE_ACTION and not instrument_legs:
             raise ValueError("corporate action requires an instrument leg")
         if self.kind is ActivityKind.FX_CONVERSION:

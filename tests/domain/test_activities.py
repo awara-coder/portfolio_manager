@@ -14,11 +14,15 @@ from portfolio_manager.domain import (
     FeeCategory,
     InstrumentId,
     InstrumentLeg,
+    InstrumentLegRole,
     Money,
     Quantity,
     SourceRecordId,
     TaxCategory,
     TenantId,
+    TransferDirection,
+    TransferId,
+    TransferMethod,
 )
 
 NOW = datetime(2026, 8, 5, 12, tzinfo=UTC)
@@ -30,7 +34,13 @@ def cash(value: str, currency: Currency, role: CashLegRole) -> CashLeg:
     return CashLeg(Money(Decimal(value), currency), role)
 
 
-def activity(kind: ActivityKind, *legs: InstrumentLeg | CashLeg) -> Activity:
+def activity(
+    kind: ActivityKind,
+    *legs: InstrumentLeg | CashLeg,
+    transfer_id: TransferId | None = None,
+    transfer_direction: TransferDirection | None = None,
+    transfer_method: TransferMethod | None = None,
+) -> Activity:
     return Activity(
         ActivityId.new(),
         TenantId.new(),
@@ -40,6 +50,9 @@ def activity(kind: ActivityKind, *legs: InstrumentLeg | CashLeg) -> Activity:
         legs,
         NOW,
         NOW,
+        transfer_id=transfer_id,
+        transfer_direction=transfer_direction,
+        transfer_method=transfer_method,
     )
 
 
@@ -128,6 +141,85 @@ def test_fx_conversion_requires_two_currencies() -> None:
         )
 
 
+def test_securities_only_acats_transfer_is_supported() -> None:
+    transfer = activity(
+        ActivityKind.TRANSFER,
+        InstrumentLeg(
+            InstrumentId.new(),
+            Quantity(Decimal("12")),
+            InstrumentLegRole.TRANSFER,
+        ),
+        transfer_id=TransferId.new(),
+        transfer_direction=TransferDirection.OUTBOUND,
+        transfer_method=TransferMethod.ACATS,
+    )
+
+    assert transfer.transfer_method is TransferMethod.ACATS
+
+
+def test_acats_sides_share_identity_across_broker_accounts() -> None:
+    transfer_id = TransferId.new()
+    instrument_id = InstrumentId.new()
+    source = activity(
+        ActivityKind.TRANSFER,
+        InstrumentLeg(instrument_id, Quantity(Decimal("-10")), InstrumentLegRole.TRANSFER),
+        cash("-25", USD, CashLegRole.TRANSFER),
+        transfer_id=transfer_id,
+        transfer_direction=TransferDirection.OUTBOUND,
+        transfer_method=TransferMethod.ACATS,
+    )
+    destination = activity(
+        ActivityKind.TRANSFER,
+        InstrumentLeg(instrument_id, Quantity(Decimal("10")), InstrumentLegRole.TRANSFER),
+        cash("25", USD, CashLegRole.TRANSFER),
+        transfer_id=transfer_id,
+        transfer_direction=TransferDirection.INBOUND,
+        transfer_method=TransferMethod.ACATS,
+    )
+
+    assert source.transfer_id == destination.transfer_id
+    assert source.broker_account_id != destination.broker_account_id
+
+
+def test_one_sided_acats_transfer_remains_valid_for_later_reconciliation() -> None:
+    transfer = activity(
+        ActivityKind.TRANSFER,
+        cash("100", USD, CashLegRole.TRANSFER),
+        transfer_id=TransferId.new(),
+        transfer_direction=TransferDirection.INBOUND,
+        transfer_method=TransferMethod.ACATS,
+    )
+
+    assert transfer.transfer_direction is TransferDirection.INBOUND
+
+
+def test_transfer_requires_complete_metadata() -> None:
+    with pytest.raises(ValueError, match="identity, direction, and method"):
+        activity(ActivityKind.TRANSFER, cash("100", USD, CashLegRole.TRANSFER))
+
+
+def test_transfer_requires_transfer_role() -> None:
+    with pytest.raises(ValueError, match="transfer leg"):
+        activity(
+            ActivityKind.TRANSFER,
+            cash("100", USD, CashLegRole.PRINCIPAL),
+            transfer_id=TransferId.new(),
+            transfer_direction=TransferDirection.INBOUND,
+            transfer_method=TransferMethod.ACATS,
+        )
+
+
+def test_non_transfer_rejects_transfer_metadata() -> None:
+    with pytest.raises(ValueError, match="only for transfer"):
+        activity(
+            ActivityKind.DEPOSIT,
+            cash("100", USD, CashLegRole.PRINCIPAL),
+            transfer_id=TransferId.new(),
+            transfer_direction=TransferDirection.INBOUND,
+            transfer_method=TransferMethod.ACATS,
+        )
+
+
 @pytest.mark.parametrize(
     ("kind", "message"),
     [
@@ -135,7 +227,6 @@ def test_fx_conversion_requires_two_currencies() -> None:
         (ActivityKind.DIVIDEND, "income leg"),
         (ActivityKind.FEE, "fee leg"),
         (ActivityKind.TAX, "tax leg"),
-        (ActivityKind.TRANSFER, "transfer leg"),
         (ActivityKind.CORPORATE_ACTION, "instrument leg"),
     ],
 )

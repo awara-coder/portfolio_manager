@@ -9,6 +9,8 @@ from portfolio_manager.domain.activities import (
     InstrumentLeg,
     InstrumentLegRole,
     TaxCategory,
+    TransferDirection,
+    TransferMethod,
 )
 from portfolio_manager.domain.identifiers import (
     ActivityId,
@@ -25,6 +27,7 @@ from portfolio_manager.domain.identifiers import (
     SnapshotId,
     SourceRecordId,
     TenantId,
+    TransferId,
     UserId,
 )
 from portfolio_manager.domain.numeric import Currency, FxRate, Money, Price, Quantity
@@ -100,6 +103,9 @@ __all__ = [
     "TenantId",
     "TenantMembership",
     "TimeRange",
+    "TransferDirection",
+    "TransferId",
+    "TransferMethod",
     "User",
     "UserId",
     "as_utc",

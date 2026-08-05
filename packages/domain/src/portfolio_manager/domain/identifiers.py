@@ -53,6 +53,10 @@ class ActivityTag:
     pass
 
 
+class TransferTag:
+    pass
+
+
 class ObservationTag:
     pass
 
@@ -93,6 +97,7 @@ SourceRecordId = Identifier[SourceRecordTag]
 CollectionRunId = Identifier[CollectionRunTag]
 RawArtifactId = Identifier[RawArtifactTag]
 ActivityId = Identifier[ActivityTag]
+TransferId = Identifier[TransferTag]
 ObservationId = Identifier[ObservationTag]
 SnapshotId = Identifier[SnapshotTag]
 ReportId = Identifier[ReportTag]

@@ -299,6 +299,8 @@ Questions the ADR must settle:
 - Native, account-base, and user-reporting currencies.
 - Trade date, settlement date, effective date, and ingestion time.
 - Corporate action and off-market transfer representation.
+- Linked inbound and outbound broker-transfer sides, including full and partial ACATS transfers of securities and cash.
+- Late or corrected transfer-lot cost basis, residual cash sweeps, ineligible assets, and fractional-share liquidation without treating a transfer as a trade.
 - Immutable correction and supersession behavior.
 
 Tests before approval:
@@ -921,6 +923,7 @@ Exit criteria:
 These do not block the core release:
 
 - Vested CSV/statement connector.
+- DriveWealth/Vested-to-IBKR ACATS reconciliation: link independently sourced account sides, retain one-sided transfers as incomplete, and reconcile transferred lots when IBKR cost-basis evidence arrives.
 - Email connector for supported broker documents after a separate privacy/security approval.
 - PDF daily report delivery.
 - Notification channels.
