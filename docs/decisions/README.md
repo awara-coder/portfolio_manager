@@ -11,3 +11,4 @@ Copy [template.md](template.md) for a new decision. Keep ADRs concise; put imple
 | [0001](0001-apache-2-license.md) | Apache License 2.0 | approved |
 | [0002](0002-modular-monolith.md) | Modular-monolith boundaries | approved |
 | [0003](0003-canonical-portfolio-data-model.md) | Canonical portfolio data model | approved |
+| [0004](0004-security-privacy-and-tenancy.md) | Security, privacy, and tenancy | proposed |
