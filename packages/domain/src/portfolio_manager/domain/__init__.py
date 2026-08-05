@@ -5,6 +5,7 @@ from portfolio_manager.domain.activities import (
     ActivityKind,
     CashLeg,
     CashLegRole,
+    CorporateActionType,
     FeeCategory,
     InstrumentLeg,
     InstrumentLegRole,
@@ -32,10 +33,15 @@ from portfolio_manager.domain.identifiers import (
 )
 from portfolio_manager.domain.numeric import Currency, FxRate, Money, Price, Quantity
 from portfolio_manager.domain.observations import (
+    AccountMetricKind,
+    AccountMetricValue,
+    AccrualKind,
+    AccrualValue,
     CashBalanceValue,
     FxRateValue,
     Observation,
     ObservationValue,
+    PositionValuationValue,
     PositionValue,
     PriceValue,
     TaxLotAuthority,
@@ -52,6 +58,7 @@ from portfolio_manager.domain.ownership import (
     Instrument,
     Listing,
     MembershipRole,
+    OptionRight,
     Tenant,
     TenantMembership,
     User,
@@ -67,6 +74,10 @@ from portfolio_manager.domain.scope import PortfolioScope
 from portfolio_manager.domain.temporal import TimeRange, as_utc
 
 __all__ = [
+    "AccountMetricKind",
+    "AccountMetricValue",
+    "AccrualKind",
+    "AccrualValue",
     "Activity",
     "ActivityId",
     "ActivityKind",
@@ -82,6 +93,7 @@ __all__ = [
     "CashLegRole",
     "CollectionRunId",
     "Completeness",
+    "CorporateActionType",
     "Currency",
     "DataQuality",
     "ExternalCashAccount",
@@ -103,7 +115,9 @@ __all__ = [
     "Observation",
     "ObservationId",
     "ObservationValue",
+    "OptionRight",
     "PortfolioScope",
+    "PositionValuationValue",
     "PositionValue",
     "Price",
     "PriceValue",

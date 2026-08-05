@@ -1,9 +1,9 @@
 # ADR 0007: IBKR source strategy
 
-- Status: proposed
+- Status: approved
 - Date: 2026-08-05
 - Gate: G6
-- Approved by: pending product-owner approval
+- Approved by: product owner
 
 ## Context
 

@@ -12,7 +12,7 @@ from portfolio_manager.domain.identifiers import (
     TenantId,
     TransferId,
 )
-from portfolio_manager.domain.numeric import Money, Quantity
+from portfolio_manager.domain.numeric import Money, Price, Quantity
 from portfolio_manager.domain.temporal import as_utc
 
 
@@ -80,11 +80,23 @@ class TransferMethod(StrEnum):
     OTHER = "other"
 
 
+class CorporateActionType(StrEnum):
+    SPLIT = "split"
+    MERGER = "merger"
+    SPIN_OFF = "spin_off"
+    EXERCISE = "exercise"
+    ASSIGNMENT = "assignment"
+    EXPIRATION = "expiration"
+    CASH_SETTLEMENT = "cash_settlement"
+    OTHER = "other"
+
+
 @dataclass(frozen=True, slots=True)
 class InstrumentLeg:
     instrument_id: InstrumentId
     quantity: Quantity
     role: InstrumentLegRole = InstrumentLegRole.POSITION
+    execution_price: Price | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -135,6 +147,7 @@ class Activity:
     transfer_id: TransferId | None = None
     transfer_direction: TransferDirection | None = None
     transfer_method: TransferMethod | None = None
+    corporate_action_type: CorporateActionType | None = None
 
     def __post_init__(self) -> None:
         if not self.legs:
@@ -186,8 +199,13 @@ class Activity:
                 raise ValueError("transfer requires a transfer leg")
         elif any(value is not None for value in transfer_metadata):
             raise ValueError("transfer metadata is allowed only for transfer activities")
-        if self.kind is ActivityKind.CORPORATE_ACTION and not instrument_legs:
-            raise ValueError("corporate action requires an instrument leg")
+        if self.kind is ActivityKind.CORPORATE_ACTION:
+            if not instrument_legs:
+                raise ValueError("corporate action requires an instrument leg")
+            if self.corporate_action_type is None:
+                raise ValueError("corporate action requires a subtype")
+        elif self.corporate_action_type is not None:
+            raise ValueError("corporate action subtype is allowed only for corporate actions")
         if self.kind is ActivityKind.FX_CONVERSION:
             currencies = {leg.money.currency for leg in cash_legs}
             if len(cash_legs) < 2 or len(currencies) < 2:

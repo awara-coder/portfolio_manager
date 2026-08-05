@@ -4,6 +4,10 @@ from decimal import Decimal
 import pytest
 
 from portfolio_manager.domain import (
+    AccountMetricKind,
+    AccountMetricValue,
+    AccrualKind,
+    AccrualValue,
     Authority,
     BrokerAccountId,
     CashBalanceValue,
@@ -18,6 +22,7 @@ from portfolio_manager.domain import (
     Observation,
     ObservationId,
     ObservationValue,
+    PositionValuationValue,
     PositionValue,
     Price,
     PriceValue,
@@ -64,6 +69,52 @@ def test_confirmed_zero_is_an_explicit_observation() -> None:
 
     assert isinstance(item.value, PositionValue)
     assert item.value.quantity == Quantity(Decimal("0"))
+
+
+def test_ibkr_position_valuation_remains_broker_reported() -> None:
+    value = PositionValuationValue(
+        BrokerAccountId.new(),
+        InstrumentId.new(),
+        mark_price=Price(Decimal("125"), USD),
+        market_value=Money(Decimal("1250"), USD),
+        cost_basis=Money(Decimal("1000"), USD),
+        unrealized_pnl=Money(Decimal("250"), USD),
+    )
+
+    assert observation(value).value is value
+
+
+def test_position_valuation_requires_a_reported_metric() -> None:
+    with pytest.raises(ValueError, match="at least one metric"):
+        PositionValuationValue(BrokerAccountId.new(), InstrumentId.new())
+
+
+def test_settled_cash_is_distinct_from_total_cash() -> None:
+    account_id = BrokerAccountId.new()
+    total = AccountMetricValue(
+        account_id,
+        AccountMetricKind.TOTAL_CASH,
+        Money(Decimal("100"), USD),
+    )
+    settled = AccountMetricValue(
+        account_id,
+        AccountMetricKind.SETTLED_CASH,
+        Money(Decimal("75"), USD),
+    )
+
+    assert total.kind is not settled.kind
+
+
+def test_accrual_is_an_observation_not_a_cash_activity() -> None:
+    value = AccrualValue(
+        BrokerAccountId.new(),
+        AccrualKind.DIVIDEND,
+        Money(Decimal("12.50"), USD),
+        instrument_id=InstrumentId.new(),
+        expected_on=date(2026, 8, 15),
+    )
+
+    assert observation(value).value is value
 
 
 def test_observation_normalizes_times_to_utc() -> None:
