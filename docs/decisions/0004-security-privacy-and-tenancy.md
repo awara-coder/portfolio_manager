@@ -1,9 +1,9 @@
 # ADR 0004: Security, privacy, and tenancy
 
-- Status: proposed
+- Status: approved
 - Date: 2026-08-05
 - Gate: G4
-- Approved by: pending
+- Approved by: product owner
 
 ## Context
 
