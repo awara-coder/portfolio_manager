@@ -155,7 +155,8 @@ Update this table before beginning work. Use agent/task identifiers rather than 
 | Immutable activity model | `feat/domain-activities` | `/private/tmp/portfolio-manager-worktrees/domain-activities` | primary agent | Tenant-owned domain entities | done | 2026-08-05 |
 | Immutable observation model | `feat/domain-observations` | `/private/tmp/portfolio-manager-worktrees/domain-observations` | primary agent | Immutable activity model | done | 2026-08-05 |
 | Record G7 and propose connector contract | `docs/approve-g7-connector-contract` | `/private/tmp/portfolio-manager-worktrees/approve-g7-connector-contract` | primary agent | G7 product-owner approval | done | 2026-08-05 |
-| Connector SDK contract | `feat/connector-sdk` | `/private/tmp/portfolio-manager-worktrees/connector-sdk` | primary agent | ADR 0006 approved | in progress | 2026-08-05 |
+| Connector SDK contract | `feat/connector-sdk` | `/private/tmp/portfolio-manager-worktrees/connector-sdk` | primary agent | ADR 0006 approved | done | 2026-08-05 |
+| Zerodha connector foundation | `feat/zerodha-connector-foundation` | `/private/tmp/portfolio-manager-worktrees/zerodha-connector-foundation` | primary agent | Connector SDK contract and G7 approved | in review | 2026-08-05 |
 
 Valid states: `planned`, `blocked`, `ready`, `in progress`, `in review`, `integrating`, `done`.
 
@@ -1022,10 +1023,10 @@ These are the next sequential actions after the user approves this plan:
 | Phase | Status | Approval state | Notes |
 |---|---|---|---|
 | 0. Repository and governance | in progress | G0/G1 approved | Apache-2.0 and modular boundaries recorded; contributor/security setup remains |
-| 1. Security and domain foundations | planned | G2/G3/G4 pending | No real financial data before approval and controls |
+| 1. Security and domain foundations | in progress | G2/G4 approved; G3 pending | No real financial data before approved controls are implemented |
 | 2. Synthetic vertical slice | planned | G5 pending | Must pass before real broker integration |
-| 3. Zerodha | planned | G7 pending | First broker; no automated login; reconstruction labeled |
-| 4. IBKR | planned | G6 pending | Begins after Zerodha exit criteria; user-assisted integration expected |
+| 3. Zerodha | in progress | G7 approved | Connector foundation follows approved hybrid source policy |
+| 4. IBKR | planned | G6 approved | Begins after Zerodha exit criteria; user-assisted integration expected |
 | 5. Analytics | planned | G3 plus provider decision pending | Deterministic calculations only |
 | 6. API and browser | planned | G5/G8 pending | Responsive, accessible dashboard |
 | 7. Assistant and MCP | planned | G9 pending | Read-only tools; AI optional |

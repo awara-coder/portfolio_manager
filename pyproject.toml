@@ -42,7 +42,11 @@ python_version = "3.13"
 strict = true
 namespace_packages = true
 explicit_package_bases = true
-mypy_path = ["packages/domain/src", "packages/application/src"]
+mypy_path = [
+  "packages/domain/src",
+  "packages/application/src",
+  "packages/connectors/src",
+]
 files = ["apps", "packages", "scripts", "tests"]
 exclude = ["^tests/governance/fixtures/"]
 
