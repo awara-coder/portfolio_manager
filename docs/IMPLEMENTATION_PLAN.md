@@ -148,6 +148,7 @@ Update this table before beginning work. Use agent/task identifiers rather than 
 | Configure code ownership | `chore/configure-codeowners` | `/private/tmp/portfolio-manager-worktrees/configure-codeowners` | primary agent | GitHub owner supplied | done | 2026-08-05 |
 | Governance baseline | `docs/governance-baseline` | `/private/tmp/portfolio-manager-worktrees/governance-baseline` | primary agent | G0/G1 approved | done | 2026-08-05 |
 | Python workspace bootstrap | `chore/python-workspace-bootstrap` | `/private/tmp/portfolio-manager-worktrees/python-workspace-bootstrap` | primary agent | G1 approved | done | 2026-08-05 |
+| Propose G2 data model | `docs/propose-g2-data-model` | `/private/tmp/portfolio-manager-worktrees/g2-data-model` | primary agent | Python workspace bootstrap | integrating | 2026-08-05 |
 
 Valid states: `planned`, `blocked`, `ready`, `in progress`, `in review`, `integrating`, `done`.
 
@@ -382,13 +383,16 @@ Tests and checks:
 Deliverables:
 
 - Deterministic synthetic accounts with INR and USD instruments.
-- Trades, cash flows, dividends, fees, fractional shares, shorts, derivatives, stale prices, and a corporate action.
+- Trades, unsettled cash flows, dividends, typed fees/taxes, fractional shares, shorts, derivatives, stale source coverage, historical FX conversions, bank-statement rows, and a corporate action.
 - Failure modes configurable for demonstrations and tests.
 
 Tests and checks:
 
 - Golden normalized outputs.
 - Repeatable snapshots for fixed clocks and seeds.
+- A report retrieved today but covering yesterday remains stale and provisional.
+- T+1/T+2 and calendar-driven settlement examples do not create false cash discrepancies.
+- Cross-currency round trips preserve historical conversions, explicit fees, and TCS as separate facts.
 - No real-looking credentials or personal data.
 
 ### 2.4 Minimal end-to-end vertical slice
@@ -565,10 +569,33 @@ Tests and checks:
 - Settlement, partial fills, fees, stale prices, missing documents, and corporate-action gaps are visible.
 - Reconstruction never silently overwrites authoritative observations.
 
+### 3.5 Bank-statement ingestion and cash reconciliation
+
+Deliverables:
+
+- Explicitly scoped local import and a connector interface for future read-only bank feeds.
+- Parsers that extract selected date ranges and relevant rows without requiring unrelated statement data to be normalized.
+- Typed bank, FX, platform, brokerage, regulatory, and tax/TCS charge records with source provenance.
+- Confidence-bearing reconciliation between bank entries, broker funding/withdrawal activity, and currency conversions.
+- Review flow for ambiguous, partial, one-to-many, and many-to-one matches.
+
+Tests and checks:
+
+- Sanitized fixtures cover INR-to-foreign-currency funding, sale proceeds, remittance, TCS, explicit FX/bank fees, bundled charges, reversals, and duplicate statements.
+- Raw account numbers and narrations never enter logs, diagnostics, committed fixtures, or browser URLs.
+- Unrelated rows remain excluded; an unmatched entry remains visible rather than being forced into a broker activity.
+- Historical INR attribution uses transaction/conversion evidence and never today's FX rate for historical cost.
+
+Approval gates:
+
+- G4 before importing real statements or retaining sensitive raw artifacts.
+- G3 before treating any charge as performance cost, tax credit, or FX attribution in analytics.
+
 Exit criteria:
 
 - Daily reports continue unattended after a Kite token expires, clearly labeled as reconstructed or stale.
 - A later interactive reconciliation explains discrepancies without rewriting history.
+- Approved bank imports can reconcile funding, withdrawals, conversions, fees, and TCS without ingesting unrelated rows into the canonical model.
 - User-assisted tests confirm approved behavior on the user's account.
 
 ## 13. Phase 5 — Pricing, FX, and portfolio analytics
