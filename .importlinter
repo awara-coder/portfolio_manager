@@ -1,0 +1,64 @@
+[importlinter]
+root_packages =
+    portfolio_manager.domain
+    portfolio_manager.application
+    portfolio_manager.analytics
+    portfolio_manager.reporting
+    portfolio_manager.assistant
+    portfolio_manager.connectors
+    portfolio_manager.persistence
+    portfolio_manager.jobs
+    portfolio_manager.observability
+    portfolio_manager.apps.api
+    portfolio_manager.apps.worker
+    portfolio_manager.apps.mcp
+include_external_packages = True
+
+[importlinter:contract:domain-independence]
+name = Domain is independent of outer modules
+type = forbidden
+source_modules =
+    portfolio_manager.domain
+forbidden_modules =
+    portfolio_manager.application
+    portfolio_manager.analytics
+    portfolio_manager.reporting
+    portfolio_manager.assistant
+    portfolio_manager.connectors
+    portfolio_manager.persistence
+    portfolio_manager.jobs
+    portfolio_manager.apps.api
+    portfolio_manager.apps.worker
+    portfolio_manager.apps.mcp
+
+[importlinter:contract:application-boundary]
+name = Application does not depend on adapters or transports
+type = forbidden
+source_modules =
+    portfolio_manager.application
+forbidden_modules =
+    portfolio_manager.analytics
+    portfolio_manager.reporting
+    portfolio_manager.assistant
+    portfolio_manager.connectors
+    portfolio_manager.persistence
+    portfolio_manager.jobs
+    portfolio_manager.apps.api
+    portfolio_manager.apps.worker
+    portfolio_manager.apps.mcp
+
+[importlinter:contract:adapters-independent]
+name = Adapter modules are mutually independent
+type = independence
+modules =
+    portfolio_manager.connectors
+    portfolio_manager.persistence
+    portfolio_manager.jobs
+
+[importlinter:contract:transports-independent]
+name = Transport modules are mutually independent
+type = independence
+modules =
+    portfolio_manager.apps.api
+    portfolio_manager.apps.worker
+    portfolio_manager.apps.mcp

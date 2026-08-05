@@ -6,7 +6,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 MODULE_SPEC = importlib.util.spec_from_file_location(
     "check_architecture", REPOSITORY_ROOT / "scripts" / "check_architecture.py"
@@ -64,9 +63,7 @@ may_import = ["domain"]
             )
             domain = root / "domain"
             domain.mkdir()
-            (domain / "model.py").write_text(
-                "import example.persistence\n", encoding="utf-8"
-            )
+            (domain / "model.py").write_text("import example.persistence\n", encoding="utf-8")
             rules = CHECKER.load_rules(root)
 
             violations = CHECKER.check_imports(root, rules)

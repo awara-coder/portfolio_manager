@@ -1,0 +1,80 @@
+[project]
+name = "portfolio-manager-workspace"
+version = "0.1.0"
+description = "Self-hosted portfolio intelligence for Zerodha and IBKR"
+requires-python = ">=3.13,<3.14"
+license = "Apache-2.0"
+dependencies = []
+
+[dependency-groups]
+dev = [
+  "hypothesis>=6.0,<7",
+  "import-linter>=2.0,<3",
+  "mypy>=1.0,<2",
+  "pre-commit>=4.0,<5",
+  "pytest>=8.0,<10",
+  "ruff>=0.16,<0.17",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["packages/*", "apps/api", "apps/worker", "apps/mcp"]
+
+[tool.uv.sources]
+portfolio-manager-domain = { workspace = true }
+portfolio-manager-application = { workspace = true }
+portfolio-manager-analytics = { workspace = true }
+portfolio-manager-reporting = { workspace = true }
+portfolio-manager-assistant = { workspace = true }
+portfolio-manager-connectors = { workspace = true }
+portfolio-manager-persistence = { workspace = true }
+portfolio-manager-jobs = { workspace = true }
+portfolio-manager-observability = { workspace = true }
+
+[tool.pytest.ini_options]
+addopts = ["--strict-config", "--strict-markers", "-ra"]
+testpaths = ["tests"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+namespace_packages = true
+explicit_package_bases = true
+files = ["apps", "packages", "scripts", "tests"]
+exclude = ["^tests/governance/fixtures/"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+extend-exclude = ["docs"]
+
+[tool.ruff.lint]
+select = [
+  "A",
+  "B",
+  "C4",
+  "E",
+  "F",
+  "FA",
+  "I",
+  "N",
+  "PERF",
+  "PIE",
+  "PT",
+  "PTH",
+  "RUF",
+  "SIM",
+  "UP",
+  "W",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["portfolio_manager"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/governance/*.py" = ["PT009", "PT027"]
+
+[tool.ruff.format]
+docstring-code-format = true

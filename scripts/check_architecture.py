@@ -49,9 +49,7 @@ def load_rules(root: Path) -> dict[str, ModuleRule]:
     for rule in rules.values():
         unknown = rule.may_import - rules.keys()
         if unknown:
-            raise ValueError(
-                f"module {rule.name!r} references unknown modules: {sorted(unknown)}"
-            )
+            raise ValueError(f"module {rule.name!r} references unknown modules: {sorted(unknown)}")
         if rule.name in rule.may_import:
             raise ValueError(f"module {rule.name!r} cannot list itself in may_import")
 
@@ -94,8 +92,7 @@ def match_module(import_name: str, rules: dict[str, ModuleRule]) -> str | None:
     matches = [
         rule
         for rule in rules.values()
-        if import_name == rule.import_prefix
-        or import_name.startswith(f"{rule.import_prefix}.")
+        if import_name == rule.import_prefix or import_name.startswith(f"{rule.import_prefix}.")
     ]
     if not matches:
         return None
