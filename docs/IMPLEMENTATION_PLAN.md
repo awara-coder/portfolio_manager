@@ -145,6 +145,7 @@ Update this table before beginning work. Use agent/task identifiers rather than 
 | Planning baseline | `main` | repository root | primary agent | none | in progress | 2026-08-05 |
 | Worktree smoke test | `docs/worktree-smoke` | `/private/tmp/portfolio-manager-worktrees/docs-worktree-smoke` | primary agent | Planning baseline | done | 2026-08-05 |
 | Record G0/G1 decisions | `docs/approve-g0-g1` | `/private/tmp/portfolio-manager-worktrees/approve-g0-g1` | primary agent | G0 and G1 approval | done | 2026-08-05 |
+| Configure code ownership | `chore/configure-codeowners` | `/private/tmp/portfolio-manager-worktrees/configure-codeowners` | primary agent | GitHub owner supplied | done | 2026-08-05 |
 
 Valid states: `planned`, `blocked`, `ready`, `in progress`, `in review`, `integrating`, `done`.
 

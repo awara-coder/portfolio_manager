@@ -30,7 +30,7 @@ The consolidated, Zerodha, and IBKR dashboards are different saved views over th
 
 ## Protected ownership
 
-The repository must not enable `CODEOWNERS` until the exact GitHub user or team is known. Once configured, repository rules must require code-owner approval after the latest push, dismiss stale approvals, require architecture and security checks, prohibit force pushes, and grant no bypass permission to agents or automation.
+`@awara-coder` is the designated human owner in `.github/CODEOWNERS`. Repository rules must require code-owner approval after the latest push, dismiss stale approvals, require architecture and security checks, prohibit force pushes, and grant no bypass permission to agents or automation.
 
 At minimum, human ownership covers:
 
@@ -43,6 +43,8 @@ At minimum, human ownership covers:
 - Domain and application packages
 - Database schemas and migrations
 - Security and secret-management code
+
+`CODEOWNERS` becomes enforceable only after the repository is hosted on GitHub and branch rules require code-owner review. Its presence in a local repository does not prevent direct commits or merges.
 
 ## Changing a boundary
 

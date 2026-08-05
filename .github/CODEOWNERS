@@ -1,0 +1,17 @@
+# Default human owner for every repository change.
+* @awara-coder
+
+# Critical policy and trust-boundary files are listed explicitly so ownership
+# remains visible if default ownership changes later.
+/AGENTS.md @awara-coder
+/architecture.toml @awara-coder
+/.github/ @awara-coder
+/.pre-commit-config.yaml @awara-coder
+/docs/architecture/ @awara-coder
+/docs/decisions/ @awara-coder
+/scripts/check_architecture.py @awara-coder
+/tests/governance/ @awara-coder
+/packages/domain/ @awara-coder
+/packages/application/ @awara-coder
+**/migrations/ @awara-coder
+**/security/ @awara-coder
