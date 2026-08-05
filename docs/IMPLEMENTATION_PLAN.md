@@ -151,7 +151,8 @@ Update this table before beginning work. Use agent/task identifiers rather than 
 | Propose G2 data model | `docs/propose-g2-data-model` | `/private/tmp/portfolio-manager-worktrees/g2-data-model` | primary agent | Python workspace bootstrap | done | 2026-08-05 |
 | Propose G4 security model | `docs/propose-g4-security` | `/private/tmp/portfolio-manager-worktrees/g4-security` | primary agent | G2 approved | done | 2026-08-05 |
 | Domain value objects | `feat/domain-value-objects` | `/private/tmp/portfolio-manager-worktrees/domain-value-objects` | primary agent | G2/G4 approved | done | 2026-08-05 |
-| Tenant-owned domain entities | `feat/domain-ownership` | `/private/tmp/portfolio-manager-worktrees/domain-ownership` | primary agent | Domain value objects | in review | 2026-08-05 |
+| Tenant-owned domain entities | `feat/domain-ownership` | `/private/tmp/portfolio-manager-worktrees/domain-ownership` | primary agent | Domain value objects | done | 2026-08-05 |
+| Immutable activity model | `feat/domain-activities` | `/private/tmp/portfolio-manager-worktrees/domain-activities` | primary agent | Tenant-owned domain entities | in review | 2026-08-05 |
 
 Valid states: `planned`, `blocked`, `ready`, `in progress`, `in review`, `integrating`, `done`.
 
