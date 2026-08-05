@@ -9,11 +9,19 @@ class TenantTag:
     pass
 
 
+class UserTag:
+    pass
+
+
 class BrokerConnectionTag:
     pass
 
 
 class BrokerAccountTag:
+    pass
+
+
+class ExternalCashAccountTag:
     pass
 
 
@@ -74,8 +82,10 @@ class Identifier[EntityTag]:
 
 
 TenantId = Identifier[TenantTag]
+UserId = Identifier[UserTag]
 BrokerConnectionId = Identifier[BrokerConnectionTag]
 BrokerAccountId = Identifier[BrokerAccountTag]
+ExternalCashAccountId = Identifier[ExternalCashAccountTag]
 InstitutionId = Identifier[InstitutionTag]
 InstrumentId = Identifier[InstrumentTag]
 ListingId = Identifier[ListingTag]
