@@ -260,9 +260,19 @@ Deliverables:
 
 - User/session model.
 - Tenant and account ownership model.
+- Active-tenant invariant requiring at least one active owner membership.
 - Local development secret backend and production secret-manager interface.
 - Envelope-encryption key hierarchy and rotation proposal.
 - Browser cookie, CSRF, session expiry, and recovery design.
+
+Tests and checks:
+
+- Tenant creation atomically creates its first owner membership.
+- Removing, disabling, or demoting the last active owner fails with a stable error.
+- Ownership transfer promotes the successor before changing the prior owner in one transaction.
+- Concurrent last-owner changes serialize on the tenant and cannot commit an abandoned active tenant.
+- Tenant deletion is the only controlled exception and follows the approved revocation and purge workflow.
+- PostgreSQL uses a deferred commit-time invariant as a backstop to application authorization.
 
 Approval gate:
 
