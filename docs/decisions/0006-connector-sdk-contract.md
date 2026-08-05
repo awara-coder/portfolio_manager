@@ -1,9 +1,9 @@
 # ADR 0006: Connector SDK contract
 
-- Status: proposed
+- Status: approved
 - Date: 2026-08-05
 - Gate: connector API approval
-- Approved by: pending product-owner approval
+- Approved by: product owner
 
 ## Context
 
