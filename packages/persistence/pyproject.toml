@@ -6,7 +6,7 @@ license = "Apache-2.0"
 dependencies = [
   "alembic>=1.16,<2",
   "asyncpg>=0.30,<1",
-  "cryptography>=46.0,<47",
+  "cryptography>=50.0.0,<51",
   "portfolio-manager-application",
   "portfolio-manager-domain",
   "sqlalchemy>=2.0,<3",
