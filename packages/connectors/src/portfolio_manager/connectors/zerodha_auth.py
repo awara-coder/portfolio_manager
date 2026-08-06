@@ -13,7 +13,12 @@ from zoneinfo import ZoneInfo
 import httpx
 from pydantic import BaseModel, ConfigDict, ValidationError
 
-from portfolio_manager.application import ConnectorError, ConnectorFailureKind
+from portfolio_manager.application import (
+    AuthorizationNonce,
+    AuthorizationNonceStore,
+    ConnectorError,
+    ConnectorFailureKind,
+)
 from portfolio_manager.connectors.zerodha_http import KiteSession
 from portfolio_manager.domain import BrokerConnectionId, TenantId, as_utc
 
@@ -84,6 +89,36 @@ class KiteNonceStore(Protocol):
     async def issue(self, authorization: PendingKiteAuthorization) -> None: ...
 
     async def consume(self, nonce_digest: str) -> PendingKiteAuthorization | None: ...
+
+
+class ApplicationKiteNonceStore:
+    """Adapts the application nonce port to the connector callback contract."""
+
+    def __init__(self, store: AuthorizationNonceStore, clock: Callable[[], datetime]) -> None:
+        self._store = store
+        self._clock = clock
+
+    async def issue(self, authorization: PendingKiteAuthorization) -> None:
+        await self._store.issue(
+            AuthorizationNonce(
+                authorization.tenant_id,
+                authorization.connection_id,
+                authorization.nonce_digest,
+                authorization.expires_at,
+                as_utc(self._clock(), "clock value"),
+            )
+        )
+
+    async def consume(self, nonce_digest: str) -> PendingKiteAuthorization | None:
+        authorization = await self._store.consume(nonce_digest)
+        if authorization is None:
+            return None
+        return PendingKiteAuthorization(
+            authorization.tenant_id,
+            authorization.connection_id,
+            authorization.digest,
+            authorization.expires_at,
+        )
 
 
 class KiteTokenExchanger(Protocol):

@@ -1,5 +1,6 @@
 """Portfolio use cases and ports."""
 
+from portfolio_manager.application.authorization import AuthorizationNonce, AuthorizationNonceStore
 from portfolio_manager.application.connectors import (
     AuthenticationState,
     AuthenticationStatus,
@@ -23,6 +24,8 @@ from portfolio_manager.application.connectors import (
 __all__ = [
     "AuthenticationState",
     "AuthenticationStatus",
+    "AuthorizationNonce",
+    "AuthorizationNonceStore",
     "Capability",
     "CapabilityOutcome",
     "Checkpoint",

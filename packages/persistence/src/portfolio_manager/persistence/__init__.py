@@ -1,5 +1,6 @@
 """Persistence and object-storage adapters."""
 
+from portfolio_manager.application import AuthorizationNonce, AuthorizationNonceStore
 from portfolio_manager.persistence.envelope import (
     EncryptedSecret,
     FileKeyEncryptionKeyProvider,
@@ -18,11 +19,11 @@ from portfolio_manager.persistence.models import (
     TenantRecord,
 )
 from portfolio_manager.persistence.nonce_store import (
-    AuthorizationNonceStore,
     NonceConflictError,
     SqlAlchemyAuthorizationNonceStore,
-    StoredAuthorizationNonce,
 )
+
+StoredAuthorizationNonce = AuthorizationNonce
 
 __all__ = [
     "AuthorizationNonceRecord",

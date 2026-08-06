@@ -7,6 +7,7 @@ from portfolio_manager.connectors.zerodha import (
     ZerodhaConnector,
 )
 from portfolio_manager.connectors.zerodha_auth import (
+    ApplicationKiteNonceStore,
     HttpxKiteTokenExchanger,
     KiteApiCredentials,
     KiteAuthorizationResult,
@@ -19,6 +20,7 @@ from portfolio_manager.connectors.zerodha_auth import (
 from portfolio_manager.connectors.zerodha_http import HttpxKiteTransport, KiteSession
 
 __all__ = [
+    "ApplicationKiteNonceStore",
     "HttpxKiteTokenExchanger",
     "HttpxKiteTransport",
     "KiteApiCredentials",

@@ -7,8 +7,9 @@ from urllib.parse import parse_qs, urlparse
 import httpx
 import pytest
 
-from portfolio_manager.application import ConnectorError, ConnectorFailureKind
+from portfolio_manager.application import AuthorizationNonce, ConnectorError, ConnectorFailureKind
 from portfolio_manager.connectors import (
+    ApplicationKiteNonceStore,
     HttpxKiteTokenExchanger,
     KiteApiCredentials,
     KiteAuthorizationService,
@@ -57,6 +58,42 @@ def fixed_clock() -> datetime:
 
 def fixed_nonce() -> str:
     return NONCE
+
+
+class ApplicationMemoryNonceStore:
+    def __init__(self) -> None:
+        self.issued: list[AuthorizationNonce] = []
+        self.next_value: AuthorizationNonce | None = None
+
+    async def issue(self, nonce: AuthorizationNonce) -> None:
+        self.issued.append(nonce)
+
+    async def consume(self, _digest: str) -> AuthorizationNonce | None:
+        return self.next_value
+
+
+def test_application_nonce_store_adapter_maps_connector_contract() -> None:
+    application_store = ApplicationMemoryNonceStore()
+    adapter = ApplicationKiteNonceStore(application_store, fixed_clock)
+    pending = PendingKiteAuthorization(
+        TenantId.new(), BrokerConnectionId.new(), sha256(NONCE.encode()).hexdigest(), NOW
+    )
+
+    asyncio.run(adapter.issue(pending))
+
+    assert application_store.issued == [
+        AuthorizationNonce(
+            pending.tenant_id,
+            pending.connection_id,
+            pending.nonce_digest,
+            pending.expires_at,
+            NOW,
+        )
+    ]
+    application_store.next_value = application_store.issued[0]
+    assert asyncio.run(adapter.consume(pending.nonce_digest)) == pending
+    application_store.next_value = None
+    assert asyncio.run(adapter.consume(pending.nonce_digest)) is None
 
 
 def authorization_service(
