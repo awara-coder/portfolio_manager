@@ -161,6 +161,7 @@ Update this table before beginning work. Use agent/task identifiers rather than 
 | Zerodha partial collection | `feat/zerodha-partial-collection` | `/private/tmp/portfolio-manager-worktrees/zerodha-partial-collection` | primary agent | Zerodha HTTP transport | done | 2026-08-06 |
 | Zerodha authentication flow | `feat/zerodha-auth-flow` | `/private/tmp/portfolio-manager-worktrees/zerodha-auth-flow` | primary agent | G4/G7 and ADR 0009 approved | in review | 2026-08-06 |
 | Zerodha secret encryption foundation | `feat/zerodha-secret-persistence` | `/private/tmp/portfolio-manager-worktrees/zerodha-secret-persistence` | primary agent | G4 and ADR 0010 approved | in review | 2026-08-06 |
+| Zerodha PostgreSQL persistence | `feat/zerodha-postgres-persistence` | `/private/tmp/portfolio-manager-worktrees/zerodha-postgres-persistence` | primary agent | G2, G4, and ADR 0011 approved | in review | 2026-08-06 |
 
 Valid states: `planned`, `blocked`, `ready`, `in progress`, `in review`, `integrating`, `done`.
 
