@@ -3,7 +3,11 @@ name = "portfolio-manager-persistence"
 version = "0.1.0"
 requires-python = ">=3.13,<3.14"
 license = "Apache-2.0"
-dependencies = ["portfolio-manager-application", "portfolio-manager-domain"]
+dependencies = [
+  "cryptography>=46.0,<47",
+  "portfolio-manager-application",
+  "portfolio-manager-domain",
+]
 
 [build-system]
 requires = ["uv_build>=0.12.1,<0.13"]
