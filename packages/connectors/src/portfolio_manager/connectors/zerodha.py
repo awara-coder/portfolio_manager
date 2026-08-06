@@ -84,6 +84,7 @@ class ZerodhaConnector:
         artifacts: list[RawArtifact] = []
         outcomes: list[CapabilityOutcome] = []
         retrieved_at = self._clock()
+        authentication_issue: ConnectorIssue | None = None
 
         for capability in sorted(request.capabilities, key=lambda item: item.value):
             endpoints = _ENDPOINTS.get(capability)
@@ -97,18 +98,46 @@ class ZerodhaConnector:
                 )
                 continue
 
-            for endpoint in endpoints:
-                payload = await self._transport.fetch(endpoint)
-                artifacts.append(
-                    RawArtifact.from_payload(
-                        payload.body,
-                        payload.media_type,
-                        retrieved_at,
-                        self.key,
-                        f"{endpoint.value}.v1",
-                        payload.source_at,
+            if authentication_issue is not None:
+                outcomes.append(
+                    CapabilityOutcome(
+                        capability,
+                        OutcomeStatus.FAILED,
+                        (authentication_issue,),
                     )
                 )
-            outcomes.append(CapabilityOutcome(capability, OutcomeStatus.SUCCEEDED))
+                continue
+
+            successful_endpoints = 0
+            issues: list[ConnectorIssue] = []
+            for endpoint in endpoints:
+                try:
+                    payload = await self._transport.fetch(endpoint)
+                    artifacts.append(
+                        RawArtifact.from_payload(
+                            payload.body,
+                            payload.media_type,
+                            retrieved_at,
+                            self.key,
+                            f"{endpoint.value}.v1",
+                            payload.source_at,
+                        )
+                    )
+                    successful_endpoints += 1
+                except ConnectorError as error:
+                    issue = ConnectorIssue(error.reason_code)
+                    if issue not in issues:
+                        issues.append(issue)
+                    if error.kind is ConnectorFailureKind.AUTHENTICATION:
+                        authentication_issue = issue
+                        break
+
+            if not issues:
+                status = OutcomeStatus.SUCCEEDED
+            elif successful_endpoints:
+                status = OutcomeStatus.PARTIAL
+            else:
+                status = OutcomeStatus.FAILED
+            outcomes.append(CapabilityOutcome(capability, status, tuple(issues)))
 
         return CollectionResult(tuple(artifacts), tuple(outcomes))
