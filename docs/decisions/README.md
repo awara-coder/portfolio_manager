@@ -16,4 +16,4 @@ Copy [template.md](template.md) for a new decision. Keep ADRs concise; put imple
 | [0006](0006-connector-sdk-contract.md) | Connector SDK contract | approved |
 | [0007](0007-ibkr-source-strategy.md) | IBKR source strategy | approved |
 | [0008](0008-ibkr-model-extensions.md) | IBKR model extensions | approved |
-| [0009](0009-zerodha-http-transport.md) | Zerodha HTTP transport | proposed |
+| [0009](0009-zerodha-http-transport.md) | Zerodha HTTP transport | approved |

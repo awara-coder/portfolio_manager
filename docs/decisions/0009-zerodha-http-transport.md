@@ -1,9 +1,9 @@
 # ADR 0009: Zerodha HTTP transport
 
-- Status: proposed
+- Status: approved
 - Date: 2026-08-06
 - Gate: Zerodha transport dependency
-- Approved by: pending
+- Approved by: product owner
 
 ## Decision
 
