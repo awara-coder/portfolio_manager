@@ -42,6 +42,7 @@ testpaths = ["tests"]
 branch = true
 source = [
   "portfolio_manager.connectors.zerodha",
+  "portfolio_manager.connectors.zerodha_auth",
   "portfolio_manager.connectors.zerodha_http",
 ]
 
