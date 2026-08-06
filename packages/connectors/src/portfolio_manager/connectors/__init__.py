@@ -6,5 +6,13 @@ from portfolio_manager.connectors.zerodha import (
     KiteTransport,
     ZerodhaConnector,
 )
+from portfolio_manager.connectors.zerodha_http import HttpxKiteTransport, KiteSession
 
-__all__ = ["KiteEndpoint", "KitePayload", "KiteTransport", "ZerodhaConnector"]
+__all__ = [
+    "HttpxKiteTransport",
+    "KiteEndpoint",
+    "KitePayload",
+    "KiteSession",
+    "KiteTransport",
+    "ZerodhaConnector",
+]

@@ -156,7 +156,8 @@ Update this table before beginning work. Use agent/task identifiers rather than 
 | Immutable observation model | `feat/domain-observations` | `/private/tmp/portfolio-manager-worktrees/domain-observations` | primary agent | Immutable activity model | done | 2026-08-05 |
 | Record G7 and propose connector contract | `docs/approve-g7-connector-contract` | `/private/tmp/portfolio-manager-worktrees/approve-g7-connector-contract` | primary agent | G7 product-owner approval | done | 2026-08-05 |
 | Connector SDK contract | `feat/connector-sdk` | `/private/tmp/portfolio-manager-worktrees/connector-sdk` | primary agent | ADR 0006 approved | done | 2026-08-05 |
-| Zerodha connector foundation | `feat/zerodha-connector-foundation` | `/private/tmp/portfolio-manager-worktrees/zerodha-connector-foundation` | primary agent | Connector SDK contract and G7 approved | in review | 2026-08-05 |
+| Zerodha connector foundation | `feat/zerodha-connector-foundation` | `/private/tmp/portfolio-manager-worktrees/zerodha-connector-foundation` | primary agent | Connector SDK contract and G7 approved | done | 2026-08-06 |
+| Zerodha HTTP transport | `feat/zerodha-http-transport` | `/private/tmp/portfolio-manager-worktrees/zerodha-http-transport` | primary agent | ADR 0009 approved | in review | 2026-08-06 |
 
 Valid states: `planned`, `blocked`, `ready`, `in progress`, `in review`, `integrating`, `done`.
 
