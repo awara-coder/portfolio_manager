@@ -1,4 +1,5 @@
 import asyncio
+from collections.abc import AsyncIterator
 from datetime import UTC, datetime, timedelta
 
 import httpx
@@ -19,6 +20,15 @@ from portfolio_manager.connectors import (
 NOW = datetime(2026, 8, 6, 12, tzinfo=UTC)
 API_KEY = "synthetic-api-key"
 ACCESS_TOKEN = "synthetic-access-token"
+
+
+class ChunkedStream(httpx.AsyncByteStream):
+    def __init__(self, *chunks: bytes) -> None:
+        self._chunks = chunks
+
+    async def __aiter__(self) -> AsyncIterator[bytes]:
+        for chunk in self._chunks:
+            yield chunk
 
 
 def session(
@@ -158,6 +168,50 @@ def test_network_timeout_is_retryable_and_secret_safe() -> None:
     assert ACCESS_TOKEN not in str(raised.value)
 
 
+def test_network_failure_is_retryable_and_secret_safe() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        raise httpx.ConnectError("synthetic connection failure", request=request)
+
+    with pytest.raises(ConnectorError) as raised:
+        run_fetch(KiteEndpoint.HOLDINGS, httpx.MockTransport(handler))
+
+    assert raised.value.kind is ConnectorFailureKind.TRANSIENT
+    assert raised.value.reason_code == "provider.network_error"
+    assert ACCESS_TOKEN not in str(raised.value)
+
+
+def test_empty_response_is_rejected() -> None:
+    mock = httpx.MockTransport(lambda _request: httpx.Response(200, content=b""))
+
+    with pytest.raises(ConnectorError) as raised:
+        run_fetch(KiteEndpoint.HOLDINGS, mock)
+
+    assert raised.value.kind is ConnectorFailureKind.VALIDATION
+    assert raised.value.reason_code == "provider.empty_response"
+
+
+def test_missing_content_type_uses_binary_media_type() -> None:
+    mock = httpx.MockTransport(lambda _request: httpx.Response(200, content=b"payload"))
+
+    payload = run_fetch(KiteEndpoint.HOLDINGS, mock)
+
+    assert payload.media_type == "application/octet-stream"
+
+
+def test_header_builder_defensively_rejects_missing_session() -> None:
+    transport = HttpxKiteTransport(
+        session(access_token=None),
+        lambda: NOW,
+        http_transport=httpx.MockTransport(lambda _request: httpx.Response(200)),
+    )
+
+    with pytest.raises(ConnectorError) as raised:
+        transport._headers()
+    asyncio.run(transport.aclose())
+
+    assert raised.value.reason_code == "session.missing"
+
+
 def test_declared_oversized_response_is_rejected_before_reading() -> None:
     mock = httpx.MockTransport(
         lambda _request: httpx.Response(
@@ -174,7 +228,66 @@ def test_declared_oversized_response_is_rejected_before_reading() -> None:
     assert raised.value.reason_code == "provider.response_too_large"
 
 
-@pytest.mark.parametrize("retry_after", ["-1", "1.5", "tomorrow", "999999999999999999999"])
+def test_malformed_content_length_is_rejected() -> None:
+    response = httpx.Response(
+        200,
+        headers={"content-length": "not-an-integer"},
+        stream=ChunkedStream(b"payload"),
+    )
+
+    with pytest.raises(ConnectorError) as raised:
+        asyncio.run(HttpxKiteTransport._read_bounded(response, 100))
+
+    assert raised.value.kind is ConnectorFailureKind.VALIDATION
+    assert raised.value.reason_code == "provider.invalid_content_length"
+
+
+@pytest.mark.parametrize("declared_length", ["-1", "101"])
+def test_invalid_declared_length_is_rejected(declared_length: str) -> None:
+    response = httpx.Response(
+        200,
+        headers={"content-length": declared_length},
+        stream=ChunkedStream(b"payload"),
+    )
+
+    with pytest.raises(ConnectorError) as raised:
+        asyncio.run(HttpxKiteTransport._read_bounded(response, 100))
+
+    assert raised.value.reason_code == "provider.response_too_large"
+
+
+def test_undeclared_streamed_oversize_is_rejected() -> None:
+    response = httpx.Response(200, stream=ChunkedStream(b"123", b"456"))
+
+    with pytest.raises(ConnectorError) as raised:
+        asyncio.run(HttpxKiteTransport._read_bounded(response, 5))
+
+    assert raised.value.reason_code == "provider.response_too_large"
+
+
+@pytest.mark.parametrize(
+    ("status", "kind", "reason"),
+    [
+        (401, ConnectorFailureKind.AUTHENTICATION, "session.expired"),
+        (405, ConnectorFailureKind.PERMANENT, "provider.endpoint_unavailable"),
+        (410, ConnectorFailureKind.PERMANENT, "provider.endpoint_unavailable"),
+        (502, ConnectorFailureKind.TRANSIENT, "provider.unavailable"),
+        (418, ConnectorFailureKind.PERMISSION, "provider.request_denied"),
+    ],
+)
+def test_remaining_http_status_classes_are_translated(
+    status: int, kind: ConnectorFailureKind, reason: str
+) -> None:
+    mock = httpx.MockTransport(lambda _request: httpx.Response(status))
+
+    with pytest.raises(ConnectorError) as raised:
+        run_fetch(KiteEndpoint.HOLDINGS, mock)
+
+    assert raised.value.kind is kind
+    assert raised.value.reason_code == reason
+
+
+@pytest.mark.parametrize("retry_after", ["-1", "0", "1.5", "tomorrow", "999999999999999999999"])
 def test_untrusted_retry_after_values_are_ignored(retry_after: str) -> None:
     mock = httpx.MockTransport(
         lambda _request: httpx.Response(429, headers={"retry-after": retry_after})

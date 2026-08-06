@@ -175,3 +175,18 @@ def test_mid_collection_authentication_failure_stops_further_broker_calls() -> N
         OutcomeStatus.FAILED,
     ]
     assert all(outcome.issues[0].code == "session.revoked" for outcome in result.outcomes)
+
+
+def test_repeated_endpoint_issue_is_reported_once() -> None:
+    repeated = ConnectorError(ConnectorFailureKind.TRANSIENT, "provider.unavailable")
+    transport = FakeKiteTransport(
+        AuthenticationState(AuthenticationStatus.READY),
+        {KiteEndpoint.ORDERS: repeated, KiteEndpoint.TRADES: repeated},
+    )
+    connector = ZerodhaConnector(transport, lambda: NOW)
+
+    result = asyncio.run(connector.collect(request(Capability.ACTIVITIES)))
+
+    assert result.outcomes[0].status is OutcomeStatus.FAILED
+    assert result.outcomes[0].issues[0].code == "provider.unavailable"
+    assert len(result.outcomes[0].issues) == 1
