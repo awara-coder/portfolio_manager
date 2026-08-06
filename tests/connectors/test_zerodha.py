@@ -20,8 +20,13 @@ NOW = datetime(2026, 8, 5, 12, tzinfo=UTC)
 
 
 class FakeKiteTransport:
-    def __init__(self, authentication: AuthenticationState) -> None:
+    def __init__(
+        self,
+        authentication: AuthenticationState,
+        failures: dict[KiteEndpoint, ConnectorError] | None = None,
+    ) -> None:
         self.authentication = authentication
+        self.failures = failures or {}
         self.requests: list[KiteEndpoint] = []
 
     async def authentication_state(self) -> AuthenticationState:
@@ -29,6 +34,8 @@ class FakeKiteTransport:
 
     async def fetch(self, endpoint: KiteEndpoint) -> KitePayload:
         self.requests.append(endpoint)
+        if failure := self.failures.get(endpoint):
+            raise failure
         media_type = "text/csv" if endpoint is KiteEndpoint.INSTRUMENTS else "application/json"
         return KitePayload(f'{{"endpoint":"{endpoint.value}"}}'.encode(), media_type)
 
@@ -107,3 +114,64 @@ def test_payload_rejects_empty_or_ambiguous_content() -> None:
         KitePayload(b"", "application/json")
     with pytest.raises(ValueError, match="trimmed"):
         KitePayload(b"{}", " application/json")
+
+
+def test_failure_in_one_capability_preserves_other_capability_evidence() -> None:
+    transport = FakeKiteTransport(
+        AuthenticationState(AuthenticationStatus.READY),
+        {
+            KiteEndpoint.HOLDINGS: ConnectorError(
+                ConnectorFailureKind.TRANSIENT, "provider.unavailable"
+            )
+        },
+    )
+    connector = ZerodhaConnector(transport, lambda: NOW)
+
+    result = asyncio.run(connector.collect(request(Capability.HOLDINGS, Capability.POSITIONS)))
+
+    assert [artifact.schema_version for artifact in result.artifacts] == ["positions.v1"]
+    outcomes = {outcome.capability: outcome for outcome in result.outcomes}
+    assert outcomes[Capability.HOLDINGS].status is OutcomeStatus.FAILED
+    assert outcomes[Capability.HOLDINGS].issues[0].code == "provider.unavailable"
+    assert outcomes[Capability.POSITIONS].status is OutcomeStatus.SUCCEEDED
+
+
+def test_activity_collection_is_partial_when_one_daily_endpoint_fails() -> None:
+    transport = FakeKiteTransport(
+        AuthenticationState(AuthenticationStatus.READY),
+        {
+            KiteEndpoint.ORDERS: ConnectorError(
+                ConnectorFailureKind.RATE_LIMIT, "provider.rate_limit"
+            )
+        },
+    )
+    connector = ZerodhaConnector(transport, lambda: NOW)
+
+    result = asyncio.run(connector.collect(request(Capability.ACTIVITIES)))
+
+    assert transport.requests == [KiteEndpoint.ORDERS, KiteEndpoint.TRADES]
+    assert [artifact.schema_version for artifact in result.artifacts] == ["trades.v1"]
+    assert result.outcomes[0].status is OutcomeStatus.PARTIAL
+    assert result.outcomes[0].issues[0].code == "provider.rate_limit"
+
+
+def test_mid_collection_authentication_failure_stops_further_broker_calls() -> None:
+    transport = FakeKiteTransport(
+        AuthenticationState(AuthenticationStatus.READY),
+        {
+            KiteEndpoint.ORDERS: ConnectorError(
+                ConnectorFailureKind.AUTHENTICATION, "session.revoked"
+            )
+        },
+    )
+    connector = ZerodhaConnector(transport, lambda: NOW)
+
+    result = asyncio.run(connector.collect(request(Capability.ACTIVITIES, Capability.HOLDINGS)))
+
+    assert transport.requests == [KiteEndpoint.ORDERS]
+    assert result.artifacts == ()
+    assert [outcome.status for outcome in result.outcomes] == [
+        OutcomeStatus.FAILED,
+        OutcomeStatus.FAILED,
+    ]
+    assert all(outcome.issues[0].code == "session.revoked" for outcome in result.outcomes)
