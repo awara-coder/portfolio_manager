@@ -17,3 +17,4 @@ Copy [template.md](template.md) for a new decision. Keep ADRs concise; put imple
 | [0007](0007-ibkr-source-strategy.md) | IBKR source strategy | approved |
 | [0008](0008-ibkr-model-extensions.md) | IBKR model extensions | approved |
 | [0009](0009-zerodha-http-transport.md) | Zerodha HTTP transport | approved |
+| [0010](0010-secret-encryption-library.md) | Secret encryption library | approved |
