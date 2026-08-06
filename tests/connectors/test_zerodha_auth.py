@@ -92,6 +92,8 @@ def test_application_nonce_store_adapter_maps_connector_contract() -> None:
     ]
     application_store.next_value = application_store.issued[0]
     assert asyncio.run(adapter.consume(pending.nonce_digest)) == pending
+    application_store.next_value = None
+    assert asyncio.run(adapter.consume(pending.nonce_digest)) is None
 
 
 def authorization_service(
