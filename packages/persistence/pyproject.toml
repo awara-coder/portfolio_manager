@@ -4,7 +4,7 @@ version = "0.1.0"
 requires-python = ">=3.13,<3.14"
 license = "Apache-2.0"
 dependencies = [
-  "alembic>=1.16,<2",
+  "alembic>=1.19.1,<2",
   "asyncpg>=0.30,<1",
   "cryptography>=50.0.0,<51",
   "portfolio-manager-application",
